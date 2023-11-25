@@ -1,9 +1,10 @@
 from html.parser import HTMLParser
 import urllib.request
-from datetime import datetime, timedelta
+from datetime import datetime
 
 class WeatherScraper(HTMLParser):
-    """ Represents a specialized HTMLParser used for scraping weather information from the city of Winnipeg. """
+    """ Represents a specialized HTMLParser used for scraping
+    weather information from the city of Winnipeg. """
     def __init__(self):
         """ Initializes an instance of the WeatherScraper class. """
         super().__init__()
@@ -22,7 +23,8 @@ class WeatherScraper(HTMLParser):
         self.weather = {}
 
     def handle_starttag(self, tag, attrs):
-        """ Checks if the current tag is one we need to scrape data from, as well as checks the date of the record if applicable. """
+        """ Checks if the current tag is one we need to scrape data from,
+        as well as checks the date of the record if applicable. """
         if tag == "tbody":
             self.is_tbody = True
 
@@ -43,14 +45,15 @@ class WeatherScraper(HTMLParser):
                         if self.date in self.date_log:
                             self.complete = True
                             return
-                        else:
-                            self.index = 0
-                            self.date_log.add(self.date)
+
+                        self.index = 0
+                        self.date_log.add(self.date)
                     except ValueError:
                         return
 
     def handle_data(self, data):
-        """ Parses the current tag and places the data in the relevant variable. """
+        """ Parses the current tag and places
+        the data in the relevant variable. """
         if self.is_td:
             if self.index == 1 or self.index == 2 or self.index == 3:
                 value = str(data.strip().split()).lstrip("['").rstrip("']")
@@ -70,7 +73,8 @@ class WeatherScraper(HTMLParser):
             self.index += 1
 
     def handle_endtag(self, tag):
-        """ Resets detection variables and appends weather data to containment dictionary. """
+        """ Resets detection variables and appends
+        weather data to containment dictionary. """
         if tag == "tr":
             self.is_tr = False
 
@@ -95,11 +99,13 @@ class WeatherScraper(HTMLParser):
             self.is_tbody = False
 
     def scrape_weather_data(self):
-        """ Scrapes data from the weather information website. """
+        """ Scrapes data from the
+        weather information website. """
         current_date = datetime.now()
 
         while True:
-            """ Loops back from the current date, querying the weather data website until dataset is complete. """
+            """ Loops back from the current date,
+            querying the weather data website until dataset is complete. """
             url = f"http://climate.weather.gc.ca/climate_data/daily_data_e.html?StationID=27174&timeframe=2&StartYear=1840&EndYear={current_date.year}&Day={current_date.day}&Year={current_date.year}&Month={current_date.month}#"
 
             with urllib.request.urlopen(url) as response:

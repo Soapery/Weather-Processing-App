@@ -3,13 +3,14 @@ import urllib.request
 from datetime import datetime, timedelta
 
 class WeatherScraper(HTMLParser):
+    """ Represents a specialized HTMLParser used for scraping weather information from the city of Winnipeg. """
     def __init__(self):
+        """ Initializes an instance of the WeatherScraper class. """
         super().__init__()
         self.is_tbody = False
         self.is_tr = False
         self.is_th = False
         self.is_td = False
-        self.is_a = False
         self.date = ""
         self.date_log = set()
         self.max = None
@@ -21,6 +22,7 @@ class WeatherScraper(HTMLParser):
         self.weather = {}
 
     def handle_starttag(self, tag, attrs):
+        """ Checks if the current tag is one we need to scrape data from, as well as checks the date of the record if applicable. """
         if tag == "tbody":
             self.is_tbody = True
 
@@ -32,9 +34,6 @@ class WeatherScraper(HTMLParser):
 
         if tag == "td" and self.is_tr:
             self.is_td = True
-
-        if tag == "a" and self.is_tr and self.is_td:
-            self.is_a = True
 
         if tag == "abbr" and self.is_tbody and self.is_tr and self.is_th:
             for name, value in attrs:
@@ -51,6 +50,7 @@ class WeatherScraper(HTMLParser):
                         return
 
     def handle_data(self, data):
+        """ Parses the current tag and places the data in the relevant variable. """
         if self.is_td:
             if self.index == 1 or self.index == 2 or self.index == 3:
                 value = str(data.strip().split()).lstrip("['").rstrip("']")
@@ -69,16 +69,14 @@ class WeatherScraper(HTMLParser):
 
             self.index += 1
 
-        if self.is_a:
-            if self.index == 1 or self.index == 2 or self.index == 3:
-                value = data.strip().split()
-                print(value)
-
     def handle_endtag(self, tag):
+        """ Resets detection variables and appends weather data to containment dictionary. """
         if tag == "tr":
             self.is_tr = False
+
         if tag == "th":
             self.is_th = False
+
         if tag == "td":
             self.is_td = False
             if self.nums_checked:
@@ -92,15 +90,16 @@ class WeatherScraper(HTMLParser):
                 self.min = None
                 self.mean = None
                 self.nums_checked = False
-        if tag == "a":
-            self.is_a = False
+
         if tag == "tbody":
             self.is_tbody = False
 
     def scrape_weather_data(self):
+        """ Scrapes data from the weather information website. """
         current_date = datetime.now()
 
         while True:
+            """ Loops back from the current date, querying the weather data website until dataset is complete. """
             url = f"http://climate.weather.gc.ca/climate_data/daily_data_e.html?StationID=27174&timeframe=2&StartYear=1840&EndYear={current_date.year}&Day={current_date.day}&Year={current_date.year}&Month={current_date.month}#"
 
             with urllib.request.urlopen(url) as response:
@@ -114,13 +113,13 @@ class WeatherScraper(HTMLParser):
             else:
                 current_date = current_date.replace(month=current_date.month - 1)
 
-            # Break condition (you might have your own exit criteria)
             if self.complete:
                 break
 
         return self.weather
 
 
-scraper = WeatherScraper()
-weather_data = scraper.scrape_weather_data()
-print(weather_data)
+if __name__ == "__main__":
+    scraper = WeatherScraper()
+    weather_data = scraper.scrape_weather_data()
+    print(weather_data)

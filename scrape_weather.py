@@ -9,11 +9,15 @@ class WeatherScraper(HTMLParser):
         self.is_tr = False
         self.is_th = False
         self.is_td = False
+        self.is_a = False
         self.date = ""
+        self.date_log = set()
         self.max = None
         self.min = None
         self.mean = None
+        self.nums_checked = False
         self.index = 0
+        self.complete = False
         self.weather = {}
 
     def handle_starttag(self, tag, attrs):
@@ -29,45 +33,67 @@ class WeatherScraper(HTMLParser):
         if tag == "td" and self.is_tr:
             self.is_td = True
 
+        if tag == "a" and self.is_tr and self.is_td:
+            self.is_a = True
+
         if tag == "abbr" and self.is_tbody and self.is_tr and self.is_th:
             for name, value in attrs:
                 if name=='title':
                     try:
                         self.date = datetime.strptime(value, "%B %d, %Y").strftime("%Y-%m-%d")
-                        self.index = 0
+                        if self.date in self.date_log:
+                            self.complete = True
+                            return
+                        else:
+                            self.index = 0
+                            self.date_log.add(self.date)
                     except ValueError:
                         return
 
     def handle_data(self, data):
         if self.is_td:
             if self.index == 1 or self.index == 2 or self.index == 3:
-                value = data.strip().split()
+                value = str(data.strip().split()).lstrip("['").rstrip("']")
+                try:
+                    value = float(value)
+                except ValueError:
+                    value = 0.0
+
                 if self.index == 1:
                     self.max = value
-                    self.index += 1
                 elif self.index == 2:
-                    self.min == value
-                    self.index += 1
+                    self.min = value
                 else:
-                    self.mean == 3
-                    self.index += 1
+                    self.mean = value
+                    self.nums_checked = True
+
+            self.index += 1
+
+        if self.is_a:
+            if self.index == 1 or self.index == 2 or self.index == 3:
+                value = data.strip().split()
+                print(value)
 
     def handle_endtag(self, tag):
-        """ Resets detection variables and appends current color to containment array. """
         if tag == "tr":
             self.is_tr = False
         if tag == "th":
             self.is_th = False
         if tag == "td":
             self.is_td = False
-            if self.max and self.min and self.mean:
+            if self.nums_checked:
                 self.weather[self.date] = {
                     "Max": self.max,
                     "Min": self.min,
                     "Mean": self.mean
                 }
-
-                print(self.weather[self.date])
+                print(f"{self.date}: {self.weather[self.date]}")
+                self.max = None
+                self.min = None
+                self.mean = None
+                self.nums_checked = False
+        if tag == "a":
+            self.is_a = False
         if tag == "tbody":
             self.is_tbody = False
 
@@ -83,15 +109,13 @@ class WeatherScraper(HTMLParser):
             # Perform operations with html content
             self.feed(html)
 
-            current_date -= timedelta(days=current_date.day)  # Move to the last day of the previous month
-            current_date = current_date.replace(day=1)  # Set the day to the first day
             if current_date.month == 1:
                 current_date = current_date.replace(year=current_date.year - 1, month=12)
             else:
                 current_date = current_date.replace(month=current_date.month - 1)
 
             # Break condition (you might have your own exit criteria)
-            if current_date.year < 1840:
+            if self.complete:
                 break
 
         return self.weather
@@ -99,3 +123,4 @@ class WeatherScraper(HTMLParser):
 
 scraper = WeatherScraper()
 weather_data = scraper.scrape_weather_data()
+print(weather_data)

@@ -26,16 +26,28 @@ class WeatherScraper(HTMLParser):
         """ Checks if the current tag is one we need to scrape data from,
         as well as checks the date of the record if applicable. """
         if tag == "tbody":
-            self.is_tbody = True
+            try:
+                self.is_tbody = True
+            except Exception as e:
+                print("Error entering td tag:", e)
 
         if tag == "tr":
-            self.is_tr = True
+            try:
+                self.is_tr = True
+            except Exception as e:
+                print("Error entering td tag:", e)
 
         if tag == "th" and self.is_tr:
-            self.is_th = True
+            try:
+                self.is_th = True
+            except Exception as e:
+                print("Error entering th tag:", e)
 
         if tag == "td" and self.is_tr:
-            self.is_td = True
+            try:
+                self.is_td = True
+            except Exception as e:
+                print("Error entering td tag:", e)
 
         if tag == "abbr" and self.is_tbody and self.is_tr and self.is_th:
             for name, value in attrs:
@@ -63,12 +75,21 @@ class WeatherScraper(HTMLParser):
                     value = 0.0
 
                 if self.index == 1:
-                    self.max = value
+                    try:
+                        self.max = value
+                    except Exception as e:
+                        print("Error setting max value:", e)
                 elif self.index == 2:
-                    self.min = value
+                    try:
+                        self.min = value
+                    except Exception as e:
+                        print("Error setting min value:", e)
                 else:
-                    self.mean = value
-                    self.nums_checked = True
+                    try:
+                        self.mean = value
+                        self.nums_checked = True
+                    except Exception as e:
+                        print("Error setting mean value:", e)
 
             self.index += 1
 
@@ -76,27 +97,43 @@ class WeatherScraper(HTMLParser):
         """ Resets detection variables and appends
         weather data to containment dictionary. """
         if tag == "tr":
-            self.is_tr = False
+            try:
+                self.is_tr = False
+            except Exception as e:
+                print("Error exiting tr tag:", e)
 
         if tag == "th":
-            self.is_th = False
+            try:
+                self.is_th = False
+            except Exception as e:
+                print("Error exiting th tag:", e)
 
         if tag == "td":
-            self.is_td = False
+            try:
+                self.is_td = False
+            except Exception as e:
+                print("Error exiting td tag:", e)
+
             if self.nums_checked:
-                self.weather[self.date] = {
-                    "Max": self.max,
-                    "Min": self.min,
-                    "Mean": self.mean
-                }
-                print(f"{self.date}: {self.weather[self.date]}")
-                self.max = None
-                self.min = None
-                self.mean = None
-                self.nums_checked = False
+                try:
+                    self.weather[self.date] = {
+                        "Max": self.max,
+                        "Min": self.min,
+                        "Mean": self.mean
+                    }
+                    print(f"{self.date}: {self.weather[self.date]}")
+                    self.max = None
+                    self.min = None
+                    self.mean = None
+                    self.nums_checked = False
+                except Exception as e:
+                    print("Error saving weather data:", e)
 
         if tag == "tbody":
-            self.is_tbody = False
+            try:
+                self.is_tbody = False
+            except Exception as e:
+                print("Error exiting tbody tag:", e)
 
     def scrape_weather_data(self):
         """ Scrapes data from the
@@ -104,24 +141,27 @@ class WeatherScraper(HTMLParser):
         current_date = datetime.now()
         current_date = current_date.replace(day=1)
 
-        while True:
-            """ Loops back from the current date,
-            querying the weather data website until dataset is complete. """
-            url = f"http://climate.weather.gc.ca/climate_data/daily_data_e.html?StationID=27174&timeframe=2&StartYear=1840&EndYear={current_date.year}&Day={current_date.day}&Year={current_date.year}&Month={current_date.month}#"
+        try:
+            while True:
+                """ Loops back from the current date,
+                querying the weather data website until dataset is complete. """
+                url = f"http://climate.weather.gc.ca/climate_data/daily_data_e.html?StationID=27174&timeframe=2&StartYear=1840&EndYear={current_date.year}&Day={current_date.day}&Year={current_date.year}&Month={current_date.month}#"
 
-            with urllib.request.urlopen(url) as response:
-                html = str(response.read())
+                with urllib.request.urlopen(url) as response:
+                    html = str(response.read())
 
-            # Perform operations with html content
-            self.feed(html)
+                # Perform operations with html content
+                self.feed(html)
 
-            if current_date.month == 1:
-                current_date = current_date.replace(year=current_date.year - 1, month=12)
-            else:
-                current_date = current_date.replace(month=current_date.month - 1)
+                if current_date.month == 1:
+                    current_date = current_date.replace(year=current_date.year - 1, month=12)
+                else:
+                    current_date = current_date.replace(month=current_date.month - 1)
 
-            if self.complete:
-                break
+                if self.complete:
+                    break
+        except Exception as e:
+            print("Error scraping weather data:", e)
 
         return self.weather
 

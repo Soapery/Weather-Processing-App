@@ -102,6 +102,7 @@ class WeatherScraper(HTMLParser):
         """ Scrapes data from the
         weather information website. """
         current_date = datetime.now()
+        current_date = current_date.replace(day=1)
 
         while True:
             """ Loops back from the current date,

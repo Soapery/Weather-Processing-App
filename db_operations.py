@@ -1,10 +1,11 @@
 import sqlite3
 from dbcm import DBCM
 from scrape_weather import WeatherScraper
+from plot_operations import PlotOperations
 
 class DBOperations:
     """ Represents a database with functions to initialize, insert data, read data, and purge the database. """
-    def __init__(self, db_name='weather_data.db'):
+    def __init__(self, db_name='weather_data.sqlite'):
         """ Initializes an instance of the DBOperations class. """
         self.db_name = db_name
 
@@ -48,17 +49,29 @@ class DBOperations:
 
     def fetch_data(self):
         """ Returns all rows from the database. """
+        weather_data = {}
+
         with DBCM(self.db_name) as cursor:
             try:
                 cursor.execute("select * from weather")
                 rows = cursor.fetchall()
-                return rows
+
+                for row in rows: 
+                    date = row[1]
+                    min_temp = row[3]
+                    max_temp = row[4]
+                    avg_temp = row[5]
+
+                    weather_data[date] = {'Min': min_temp, 'Max': max_temp, 'Mean': avg_temp}
+
+                return weather_data
             except Exception as e:
                 print("Error fetching from weather:", e)
                 return e
 
 if __name__ == "__main__":
     weather_scraper = WeatherScraper()
+    plotter = PlotOperations()
     db_ops = DBOperations()
 
     weather_data = weather_scraper.scrape_weather_data()
@@ -66,3 +79,13 @@ if __name__ == "__main__":
     db_ops.initialize_db()
     db_ops.purge_data()
     db_ops.save_data(weather_data, "Winnipeg, MB")
+
+    plot_data = db_ops.fetch_data()
+
+    boxplot_start_year = int(input("Enter a starting year for your boxplot: "))
+    boxplot_end_year = int(input("Enter an end year for your boxplot: "))    
+    plotter.create_boxplot(plot_data, boxplot_start_year, boxplot_end_year)
+
+    lineplot_year = int(input("Enter a year for your lineplot: "))
+    lineplot_month = int(input("Enter a month for your lineplot: "))
+    plotter.create_lineplot(plot_data, lineplot_year, lineplot_month)

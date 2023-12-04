@@ -2,7 +2,7 @@ import sqlite3
 
 class DBCM:
     """ Context Manager class for handling SQLite3 database connections. """
-    def __init__(self, db_name='weather_data.db'):
+    def __init__(self, db_name='weather_data.sqlite'):
         """ Initializes an instance of the DBCM class. """
         self.db_name = db_name
         self.conn = None

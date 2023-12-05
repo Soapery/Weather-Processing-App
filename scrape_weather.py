@@ -1,6 +1,7 @@
 from html.parser import HTMLParser
 import urllib.request
 from datetime import datetime
+from weather_logger import WeatherLogger
 
 class WeatherScraper(HTMLParser):
     """ Represents a specialized HTMLParser used for scraping
@@ -22,6 +23,9 @@ class WeatherScraper(HTMLParser):
         self.complete = False
         self.weather = {}
 
+        logger = WeatherLogger()
+        self.logger = logger.get_logger()
+
     def handle_starttag(self, tag, attrs):
         """ Checks if the current tag is one we need to scrape data from,
         as well as checks the date of the record if applicable. """
@@ -29,25 +33,25 @@ class WeatherScraper(HTMLParser):
             try:
                 self.is_tbody = True
             except Exception as e:
-                print("Error entering td tag:", e)
+                self.logger.error("Error entering td tag:", e)
 
         if tag == "tr":
             try:
                 self.is_tr = True
             except Exception as e:
-                print("Error entering td tag:", e)
+                self.logger.error("Error entering td tag:", e)
 
         if tag == "th" and self.is_tr:
             try:
                 self.is_th = True
             except Exception as e:
-                print("Error entering th tag:", e)
+                self.logger.error("Error entering th tag:", e)
 
         if tag == "td" and self.is_tr:
             try:
                 self.is_td = True
             except Exception as e:
-                print("Error entering td tag:", e)
+                self.logger.error("Error entering td tag:", e)
 
         if tag == "abbr" and self.is_tbody and self.is_tr and self.is_th:
             for name, value in attrs:
@@ -56,6 +60,7 @@ class WeatherScraper(HTMLParser):
                         self.date = datetime.strptime(value, "%B %d, %Y").strftime("%Y-%m-%d")
                         if self.date in self.date_log:
                             self.complete = True
+                            self.logger.info("Scraping website completed successfully.")
                             return
 
                         self.index = 0
@@ -78,18 +83,18 @@ class WeatherScraper(HTMLParser):
                     try:
                         self.max = value
                     except Exception as e:
-                        print("Error setting max value:", e)
+                        self.logger.error("Error setting max value:", e)
                 elif self.index == 2:
                     try:
                         self.min = value
                     except Exception as e:
-                        print("Error setting min value:", e)
+                        self.logger.error("Error setting min value:", e)
                 else:
                     try:
                         self.mean = value
                         self.nums_checked = True
                     except Exception as e:
-                        print("Error setting mean value:", e)
+                        self.logger.error("Error setting mean value:", e)
 
             self.index += 1
 
@@ -100,19 +105,19 @@ class WeatherScraper(HTMLParser):
             try:
                 self.is_tr = False
             except Exception as e:
-                print("Error exiting tr tag:", e)
+                self.logger.error("Error exiting tr tag:", e)
 
         if tag == "th":
             try:
                 self.is_th = False
             except Exception as e:
-                print("Error exiting th tag:", e)
+                self.logger.error("Error exiting th tag:", e)
 
         if tag == "td":
             try:
                 self.is_td = False
             except Exception as e:
-                print("Error exiting td tag:", e)
+                self.logger.error("Error exiting td tag:", e)
 
             if self.nums_checked:
                 try:
@@ -121,19 +126,19 @@ class WeatherScraper(HTMLParser):
                         "Min": self.min,
                         "Mean": self.mean
                     }
-                    print(f"{self.date}: {self.weather[self.date]}")
+                    # self.logger.info(f"{self.date}: {self.weather[self.date]}")
                     self.max = None
                     self.min = None
                     self.mean = None
                     self.nums_checked = False
                 except Exception as e:
-                    print("Error saving weather data:", e)
+                    self.logger.error("Error saving weather data:", e)
 
         if tag == "tbody":
             try:
                 self.is_tbody = False
             except Exception as e:
-                print("Error exiting tbody tag:", e)
+                self.logger.error("Error exiting tbody tag:", e)
 
     def scrape_weather_data(self):
         """ Scrapes data from the
@@ -160,8 +165,10 @@ class WeatherScraper(HTMLParser):
 
                 if self.complete:
                     break
+                else:
+                    self.logger.info(f"Finished scraping: {current_date.strftime('%B - %Y')}")
         except Exception as e:
-            print("Error scraping weather data:", e)
+            self.logger.error("Error scraping weather data:", e)
 
         return self.weather
 

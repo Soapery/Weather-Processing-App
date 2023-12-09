@@ -8,6 +8,7 @@ from dbcm import DBCM
 from scrape_weather import WeatherScraper
 from plot_operations import PlotOperations
 from weather_logger import WeatherLogger
+from datetime import datetime
 
 class DBOperations:
     """ Represents a database with functions to initialize,
@@ -58,7 +59,8 @@ class DBOperations:
                             (sample_date, location, min_temp, max_temp, avg_temp)
                         VALUES
                             (?, ?, ?, ?, ?)
-                    ''', (date, location, min_temp, max_temp, avg_temp))
+                    ''', date, location, min_temp, max_temp, avg_temp)
+                    # (datetime.strptime(date, "%Y-%m-%d")
                 self.logger.info("Database insert of %s items completed successfully.", len(weather_data))
             except Exception as e:
                 self.logger.critical("Database insert failed! Error: %s", e)

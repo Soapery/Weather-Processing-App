@@ -1,5 +1,6 @@
 """
-This module contains the DBCM class, which manages cursors and opening/closing connections to a SQLite3 database.
+This module contains the DBCM class,
+which manages cursors and opening/closing connections to a SQLite3 database.
 """
 
 import sqlite3
@@ -22,7 +23,7 @@ class DBCM:
             self.logger.info("Opened database successfully.")
             return self.conn.cursor()
         except Exception as e:
-            self.logger.error("Opening database failed! Error:", e)
+            self.logger.error("Opening database failed! Error: %s", e)
             return e
 
     def __exit__(self, exc_type, exc_val, exc_trace):

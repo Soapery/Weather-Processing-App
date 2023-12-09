@@ -1,5 +1,6 @@
 """
-This module contains the DBOperations class, which has functions for initializing, purging, and saving data in a SQLite3 database.
+This module contains the DBOperations class,
+which has functions for initializing, purging, and saving data in a SQLite3 database.
 This module imports the DBCM module to manage cursors and opening/closing connections.
 """
 
@@ -9,7 +10,8 @@ from plot_operations import PlotOperations
 from weather_logger import WeatherLogger
 
 class DBOperations:
-    """ Represents a database with functions to initialize, insert data, read data, and purge the database. """
+    """ Represents a database with functions to initialize,
+    insert data, read data, and purge the database. """
     def __init__(self, db_name='weather_data.sqlite'):
         """ Initializes an instance of the DBOperations class. """
         self.db_name = db_name
@@ -32,7 +34,7 @@ class DBOperations:
 
                 self.logger.info("Database initialized successfully.")
             except Exception as e:
-                self.logger.critical("Database initialization failed! Error:", e)
+                self.logger.critical("Database initialization failed! Error: %s", e)
 
     def purge_data(self):
         """ Purges the database of all entries. """
@@ -41,7 +43,7 @@ class DBOperations:
                 cursor.execute('''delete from weather''')
                 self.logger.info("Database purged successfully.")
             except Exception as e:
-                self.logger.error("Database purge failed! Error:", e)
+                self.logger.error("Database purge failed! Error: %s", e)
 
     def save_data(self, weather_data, location="Winnipeg, MB"):
         """ Accepts a dictionary of weather data and inserts the given values into the database. """
@@ -52,12 +54,14 @@ class DBOperations:
                     min_temp = data.get('Min')
                     avg_temp = data.get('Mean')
                     cursor.execute('''
-                        INSERT OR IGNORE INTO weather (sample_date, location, min_temp, max_temp, avg_temp)
-                        VALUES (?, ?, ?, ?, ?)
+                        INSERT OR IGNORE INTO weather
+                            (sample_date, location, min_temp, max_temp, avg_temp)
+                        VALUES
+                            (?, ?, ?, ?, ?)
                     ''', (date, location, min_temp, max_temp, avg_temp))
-                self.logger.info(f"Database insert of {len(weather_data)} items completed successfully.")
+                self.logger.info("Database insert of %s items completed successfully.", len(weather_data))
             except Exception as e:
-                self.logger.critical("Database insert failed! Error:", e)
+                self.logger.critical("Database insert failed! Error: %s", e)
 
     def fetch_data(self):
         """ Returns all rows from the database. """
@@ -76,10 +80,10 @@ class DBOperations:
 
                     weather_data[date] = {'Min': min_temp, 'Max': max_temp, 'Mean': avg_temp}
 
-                self.logger.info(f"Database rows from database \"{self.db_name}\" retrieved successfully.")
+                self.logger.info("Database rows from database \"%s\" retrieved successfully.", self.db_name)
                 return weather_data
             except Exception as e:
-                print(f"Error fetching rows from \"{self.db_name}\". Error:", e)
+                self.logger.error("Error fetching rows from table. Error: %s", e)
                 return e
 
 if __name__ == "__main__":

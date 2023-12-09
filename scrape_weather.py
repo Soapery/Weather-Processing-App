@@ -38,25 +38,25 @@ class WeatherScraper(HTMLParser):
             try:
                 self.is_tbody = True
             except Exception as e:
-                self.logger.error("Error entering td tag:", e)
+                self.logger.error("Error entering td tag: %s", e)
 
         if tag == "tr":
             try:
                 self.is_tr = True
             except Exception as e:
-                self.logger.error("Error entering td tag:", e)
+                self.logger.error("Error entering td tag: %s", e)
 
         if tag == "th" and self.is_tr:
             try:
                 self.is_th = True
             except Exception as e:
-                self.logger.error("Error entering th tag:", e)
+                self.logger.error("Error entering th tag: %s", e)
 
         if tag == "td" and self.is_tr:
             try:
                 self.is_td = True
             except Exception as e:
-                self.logger.error("Error entering td tag:", e)
+                self.logger.error("Error entering td tag: %s", e)
 
         if tag == "abbr" and self.is_tbody and self.is_tr and self.is_th:
             for name, value in attrs:
@@ -88,18 +88,18 @@ class WeatherScraper(HTMLParser):
                     try:
                         self.max = value
                     except Exception as e:
-                        self.logger.error("Error setting max value:", e)
+                        self.logger.error("Error setting max value: %s", e)
                 elif self.index == 2:
                     try:
                         self.min = value
                     except Exception as e:
-                        self.logger.error("Error setting min value:", e)
+                        self.logger.error("Error setting min value: %s", e)
                 else:
                     try:
                         self.mean = value
                         self.nums_checked = True
                     except Exception as e:
-                        self.logger.error("Error setting mean value:", e)
+                        self.logger.error("Error setting mean value: %s", e)
 
             self.index += 1
 
@@ -110,19 +110,19 @@ class WeatherScraper(HTMLParser):
             try:
                 self.is_tr = False
             except Exception as e:
-                self.logger.error("Error exiting tr tag:", e)
+                self.logger.error("Error exiting tr tag: %s", e)
 
         if tag == "th":
             try:
                 self.is_th = False
             except Exception as e:
-                self.logger.error("Error exiting th tag:", e)
+                self.logger.error("Error exiting th tag: %s", e)
 
         if tag == "td":
             try:
                 self.is_td = False
             except Exception as e:
-                self.logger.error("Error exiting td tag:", e)
+                self.logger.error("Error exiting td tag: %s", e)
 
             if self.nums_checked:
                 try:
@@ -137,13 +137,13 @@ class WeatherScraper(HTMLParser):
                     self.mean = None
                     self.nums_checked = False
                 except Exception as e:
-                    self.logger.error("Error saving weather data:", e)
+                    self.logger.error("Error saving weather data: %s", e)
 
         if tag == "tbody":
             try:
                 self.is_tbody = False
             except Exception as e:
-                self.logger.error("Error exiting tbody tag:", e)
+                self.logger.error("Error exiting tbody tag: %s", e)
 
     def scrape_weather_data(self):
         """ Scrapes data from the
@@ -170,10 +170,10 @@ class WeatherScraper(HTMLParser):
 
                 if self.complete:
                     break
-                else:
-                    self.logger.info(f"Finished scraping: {current_date.strftime('%B - %Y')}")
+
+                self.logger.info("Finished scraping: %s", current_date.strftime('%B - %Y'))
         except Exception as e:
-            self.logger.error("Error scraping weather data:", e)
+            self.logger.error("Error scraping weather data: %s", e)
 
         return self.weather
 

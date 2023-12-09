@@ -1,3 +1,7 @@
+"""
+This module contains the WeatherLogger class, which returns a formatted logger for logging data in this application.
+"""
+
 import logging
 
 class WeatherLogger:

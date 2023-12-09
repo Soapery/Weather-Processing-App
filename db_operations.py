@@ -1,4 +1,8 @@
-import sqlite3
+"""
+This module contains the DBOperations class, which has functions for initializing, purging, and saving data in a SQLite3 database.
+This module imports the DBCM module to manage cursors and opening/closing connections.
+"""
+
 from dbcm import DBCM
 from scrape_weather import WeatherScraper
 from plot_operations import PlotOperations

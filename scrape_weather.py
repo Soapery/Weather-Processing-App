@@ -1,3 +1,8 @@
+"""
+This module contains the WeatherScraper class, which inherets the HTMLParser class.
+WeatherScraper contains functions for scraping weather data for the city of Winnipeg, and returning it to the user.
+"""
+
 from html.parser import HTMLParser
 import urllib.request
 from datetime import datetime

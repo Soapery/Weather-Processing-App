@@ -1,3 +1,7 @@
+"""
+This module contains the DBCM class, which manages cursors and opening/closing connections to a SQLite3 database.
+"""
+
 import sqlite3
 from weather_logger import WeatherLogger
 

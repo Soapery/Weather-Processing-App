@@ -71,7 +71,7 @@ class DBOperations:
 
         with DBCM(self.db_name) as cursor:
             try:
-                cursor.execute("select * from weather")
+                cursor.execute("select * from weather order by sample_date desc")
                 rows = cursor.fetchall()
 
                 for row in rows:
@@ -89,22 +89,23 @@ class DBOperations:
                 return e
 
 if __name__ == "__main__":
-    weather_scraper = WeatherScraper()
-    plotter = PlotOperations()
+    # weather_scraper = WeatherScraper()
+    # plotter = PlotOperations()
     db_ops = DBOperations()
 
-    weather_data = weather_scraper.scrape_weather_data()
+    # weather_data = weather_scraper.scrape_weather_data()
 
     db_ops.initialize_db()
-    db_ops.purge_data()
-    db_ops.save_data(weather_data, "Winnipeg, MB")
+    # db_ops.purge_data()
+    # db_ops.save_data(weather_data, "Winnipeg, MB")
 
     plot_data = db_ops.fetch_data()
+    print(plot_data)
 
-    boxplot_start_year = int(input("Enter a starting year for your boxplot: "))
-    boxplot_end_year = int(input("Enter an end year for your boxplot: "))
-    plotter.create_boxplot(plot_data, boxplot_start_year, boxplot_end_year)
+    # boxplot_start_year = int(input("Enter a starting year for your boxplot: "))
+    # boxplot_end_year = int(input("Enter an end year for your boxplot: "))
+    # plotter.create_boxplot(plot_data, boxplot_start_year, boxplot_end_year)
 
-    lineplot_year = int(input("Enter a year for your lineplot: "))
-    lineplot_month = int(input("Enter a month for your lineplot: "))
-    plotter.create_lineplot(plot_data, lineplot_year, lineplot_month)
+    # lineplot_year = int(input("Enter a year for your lineplot: "))
+    # lineplot_month = int(input("Enter a month for your lineplot: "))
+    # plotter.create_lineplot(plot_data, lineplot_year, lineplot_month)

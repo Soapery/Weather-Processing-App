@@ -89,7 +89,7 @@ class DBOperations:
                 return e
 
 if __name__ == "__main__":
-    # weather_scraper = WeatherScraper()
+    weather_scraper = WeatherScraper()
     # plotter = PlotOperations()
     db_ops = DBOperations()
 
@@ -100,7 +100,13 @@ if __name__ == "__main__":
     # db_ops.save_data(weather_data, "Winnipeg, MB")
 
     plot_data = db_ops.fetch_data()
-    print(plot_data)
+    # Testing weather updating
+    for date in list(plot_data.keys()):
+        if date > "2023-12-04":
+            del plot_data[date]
+        else:
+            break
+    print(weather_scraper.get_new_weather_data(plot_data))
 
     # boxplot_start_year = int(input("Enter a starting year for your boxplot: "))
     # boxplot_end_year = int(input("Enter an end year for your boxplot: "))

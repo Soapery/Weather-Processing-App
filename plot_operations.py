@@ -1,5 +1,7 @@
 """
-This module contains the PlotOperations class, which contains functions for generating boxplots and lineplots based on user-supplied weather data.
+This module contains the PlotOperations class,
+which contains functions for generating boxplots
+and lineplots based on user-supplied weather data.
 """
 
 import matplotlib.pyplot as plt

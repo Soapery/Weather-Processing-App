@@ -177,6 +177,25 @@ class WeatherScraper(HTMLParser):
 
         return self.weather
 
+    def get_new_weather_data(self, outdated_weather_data):
+        """ Accepts a list of weather data and
+        returns a list of weather data for the dates missing on the original list. """
+
+        most_recent_date = str(list(outdated_weather_data.keys())[0])
+
+        self.date_log.add(most_recent_date)
+
+        new_data = self.scrape_weather_data()
+
+        for date in list(new_data.keys()):
+            if date < most_recent_date:
+                del new_data[date]
+
+        return new_data
+
+
+
+
 
 if __name__ == "__main__":
     scraper = WeatherScraper()

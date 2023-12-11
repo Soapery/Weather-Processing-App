@@ -27,21 +27,12 @@ class WeatherProcessor:
         self.last_date = ""
         self.db_state = ""
         self.main_title = ""
+        self.options = []
         self.db_present = False
         self.get_first_and_last_date()
+        self.update_options()
 
-        options = [
-            ("Download Weather Data", self.download_weather_data),
-        ]
-
-        if self.db_present:
-            options.append(("Update Weather Data", self.update_weather_data))
-            options.append(("Generate Box Plot", self.generate_box_plot))
-            options.append(("Generate Line Plot", self.generate_line_plot))
-
-        options.append(("Exit", self.exit_application))
-
-        self.main = Menu(title=self.main_title, prompt=">>", options=options)
+        self.main = Menu(title=self.main_title, prompt=">>", options=self.options)
 
     def download_weather_data(self):
         """Prompts the user to confirm scraping,
@@ -50,11 +41,13 @@ class WeatherProcessor:
         def begin_scraping(self, sub):
             """Initiates the process of scraping the Winnipeg weather site,
             going from most recent to oldest."""
-            weather_data = self.weather_scraper.scrape_weather_data()
+            self.weather_data = self.weather_scraper.scrape_weather_data()
             self.db_ops.initialize_db()
             self.db_ops.purge_data()
-            self.db_ops.save_data(weather_data, "Winnipeg, MB")
+            self.db_ops.save_data(self.weather_data, "Winnipeg, MB")
             self.get_first_and_last_date()
+            self.db_present = True
+            self.update_options()
 
             sub.close()
 
@@ -219,6 +212,21 @@ class WeatherProcessor:
         print("Exiting WeatherProcessor. Goodbye!")
         exit()
 
+    def update_options(self):
+        self.options = [
+            ("Download Weather Data", self.download_weather_data),
+        ]
+
+        if self.db_present:
+            self.options.append(("Update Weather Data", self.update_weather_data))
+            self.options.append(("Generate Box Plot", self.generate_box_plot))
+            self.options.append(("Generate Line Plot", self.generate_line_plot))
+
+        self.options.append(("Exit", self.exit_application))
+
+        if self.main is not None:
+            self.main.set_options(self.options)
+
     def run(self):
         """Opens the menu and displays it to the menu."""
         self.main.open()
@@ -232,5 +240,4 @@ class EndGreaterThanStartError(Exception):
     """Custom exception class raised when user selects an end year less than the start"""
 
 
-if __name__ == "__main__":
-    WeatherProcessor().run()
+WeatherProcessor().run()

@@ -55,7 +55,7 @@ class WeatherProcessor:
             self.db_ops.purge_data()
             self.db_ops.save_data(weather_data, "Winnipeg, MB")
 
-        options = [("Confirm", begin_scraping), ("Cancel", Menu.CLOSE)]
+        options = [("Confirm", begin_scraping, {"self": self}), ("Cancel", Menu.CLOSE)]
 
         sub = Menu(
             title="Download new weather data? This process will take a while.",

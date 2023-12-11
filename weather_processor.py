@@ -47,21 +47,27 @@ class WeatherProcessor:
         """Prompts the user to confirm scraping,
         or go back to the main menu."""
 
-        def begin_scraping(self):
+        def begin_scraping(self, sub):
             """Initiates the process of scraping the Winnipeg weather site,
             going from most recent to oldest."""
             weather_data = self.weather_scraper.scrape_weather_data()
             self.db_ops.initialize_db()
             self.db_ops.purge_data()
             self.db_ops.save_data(weather_data, "Winnipeg, MB")
+            self.get_first_and_last_date()
 
-        options = [("Confirm", begin_scraping, {"self": self}), ("Cancel", Menu.CLOSE)]
+            sub.close()
 
         sub = Menu(
             title="Download new weather data? This process will take a while.",
             prompt=">>",
-            options=options,
         )
+
+        options = [
+            ("Confirm", begin_scraping, {"self": self, "sub": sub}),
+            ("Cancel", Menu.CLOSE),
+        ]
+        sub.set_options(options)
 
         sub.open()
 

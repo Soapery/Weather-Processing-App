@@ -28,7 +28,7 @@ class WeatherProcessor:
         self.db_state = ""
         self.main_title = ""
         self.options = []
-        self.db_present = False
+        self.db_present = True if self.weather_data is not None else False
         self.get_first_and_last_date()
         self.update_options()
 

@@ -3,14 +3,14 @@
 
 #define MyAppName "WeatherProcessor"
 #define MyAppVersion "1.0"
-#define MyAppPublisher "Red River College Polytechnic"
+#define MyAppPublisher "RRC Polytech"
 #define MyAppURL "https://www.rrc.ca/"
 #define MyAppExeName "weather_processor.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{35529681-0301-4375-92BB-446A6161A424}
+AppId={{5736270E-387B-4135-A266-55FA8E1F31B4}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
@@ -23,7 +23,7 @@ DisableProgramGroupPage=yes
 LicenseFile=C:\Users\Soap\Downloads\gpl-3.0.txt
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputBaseFilename=WeatherProcessor_Installer
+OutputBaseFilename=WeatherProcessor
 SetupIconFile=C:\Users\Soap\Downloads\cloudy-day.ico
 Compression=lzma
 SolidCompression=yes

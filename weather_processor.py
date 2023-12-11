@@ -232,4 +232,5 @@ class EndGreaterThanStartError(Exception):
     """Custom exception class raised when user selects an end year less than the start"""
 
 
-WeatherProcessor().run()
+if __name__ == "__main__":
+    WeatherProcessor().run()
